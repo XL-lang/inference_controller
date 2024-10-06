@@ -1,0 +1,27 @@
+ model_name = "textattack/bert-base-uncased-MRPC"
+mrpc_text1 = "The quick brown fox jumps over the lazy dog"
+mrpc_text2 = "A fast brown fox leaps over a lazy dog"
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = model_class.from_pretrained(checkpoint)
+# 准备输入数据
+dummy_input = tokenizer(mrpc_text1,
+                        mrpc_text2,  # MRPC 是句子对任务
+                        max_length=128,  # 设置合适的最大长度
+                        truncation=True,  # 启用截断
+                        padding='max_length',  # 启用填充到最大长度
+                        return_tensors="pt"  # 返回 PyTorch tensors
+                        );
+# 导出模型
+torch.onnx.export(
+    model,  # 模型实例
+    (dummy_input['input_ids'], dummy_input['attention_mask'], dummy_input['label']),  # 模型输入
+    '../runs/two_layer_{}.onnx'.format(i),  # 导出路径
+    export_params=True,  # 是否导出模型参数
+    opset_version=14,  # ONNX opset 版本
+    input_names=['input_ids', 'attention_mask', 'labels'],  # 输入名称
+    output_names=['output'],  # 输出名称
+    dynamic_axes={'input_ids': {0: 'batch_size'},  # 动态轴设置
+                  'attention_mask': {0: 'batch_size'},
+                  'labels': {0: 'batch_size'},
+                  'output': {0: 'batch_size'}}
+)

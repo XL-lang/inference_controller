@@ -1,0 +1,16 @@
+name: None
+network:
+  in:
+    - from: "server"
+      structure: ["mask_id","token_id"]
+      url : None
+  out:
+    - structure: ["tensor"]
+      to: "callback"
+      url: None
+model:
+  model_name: ["middle_transformer_layer2_3"]
+
+decode:
+  open: True
+  decode_type: "data_input"
